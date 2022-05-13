@@ -5,9 +5,16 @@ if !exists('g:extra_whitespace_ignored_filetypes')
     let g:extra_whitespace_ignored_filetypes = []
 endif
 
+if !exists('g:extra_whitespace_ignored_filenames')
+    let g:extra_whitespace_ignored_filenames = []
+endif
+
 function! ShouldMatchWhitespace()
     for ft in g:extra_whitespace_ignored_filetypes
         if ft ==# &filetype | return 0 | endif
+    endfor
+    for fname in g:extra_whitespace_ignored_filenames
+        if expand('%:t') =~ fname | return 0 | endif
     endfor
     return 1
 endfunction
@@ -15,7 +22,7 @@ endfunction
 " Highlight EOL whitespace, http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 highlight default ExtraWhitespace ctermbg=darkred guibg=darkred
 autocmd ColorScheme * highlight default ExtraWhitespace ctermbg=darkred guibg=darkred
-autocmd BufRead,BufNew * if ShouldMatchWhitespace() | match ExtraWhitespace /\\\@<![\u3000[:space:]]\+$/ | else | match ExtraWhitespace /^^/ | endif
+autocmd BufEnter,WinEnter * if ShouldMatchWhitespace() | match ExtraWhitespace /\\\@<![\u3000[:space:]]\+$/ | else | match ExtraWhitespace /^^/ | endif
 
 " The above flashes annoyingly while typing, be calmer in insert mode
 autocmd InsertLeave * if ShouldMatchWhitespace() | match ExtraWhitespace /\\\@<![\u3000[:space:]]\+$/ | endif
